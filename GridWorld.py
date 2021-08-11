@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, Set
+from typing import Tuple, Set, Optional, List
 
 import numpy as np
 
@@ -32,9 +32,9 @@ class GridWorld:
         self.add_walls(walls)
         self.add_holes(holes)
         self.add_goal()
-        self.add_player()
+        self.set_player()
 
-    def _filled_positions(self, include_player=False) -> Set[Tuple[int, int]]:
+    def _filled_positions(self, include_player: bool = False) -> Set[Tuple[int, int]]:
         filled = set()
         if include_player and self.pieces['Player']:
             filled.add(self.pieces['Player'])
@@ -44,7 +44,7 @@ class GridWorld:
             filled.add(h)
         return filled
 
-    def _is_empty(self, pos) -> bool:
+    def _is_empty(self, pos: Tuple[int, int]) -> bool:
         return pos not in self._filled_positions(include_player=True)
 
     def _get_pos(self) -> Tuple[int, int]:
@@ -62,20 +62,21 @@ class GridWorld:
             raise Exception('Too many attempts looking for empty position')
         return pos
 
-    def add_player(self) -> None:
-        pos = self._get_empty_pos()
+    def set_player(self, pos: Optional[Tuple[int, int]] = None) -> None:
+        if not pos:
+            pos = self._get_empty_pos()
         self.pieces['Player'] = pos
 
     def add_goal(self) -> None:
         pos = self._get_empty_pos()
         self.pieces['Goal'] = pos
 
-    def add_walls(self, count) -> None:
+    def add_walls(self, count: int) -> None:
         for _ in range(count):
             pos = self._get_empty_pos()
             self.pieces['Walls'].append(pos)
 
-    def add_holes(self, count) -> None:
+    def add_holes(self, count: int) -> None:
         for _ in range(count):
             pos = self._get_empty_pos()
             self.pieces['Holes'].append(pos)
@@ -104,26 +105,43 @@ class GridWorld:
             output += row_str
         print(output)
 
-    def move_player(self, mv):
+    def _pos_out_of_bounds(self, pos: Tuple[int, int]) -> bool:
+        y, x = pos
+        return not (0 <= y < self.size) or not (0 <= x < self.size)
+
+    def move_player(self, action: List) -> None:
         # [up, down, left, right]
+        # TODO refactor this horrible mess
         p_pos = self.pieces['Player']
-        if mv[0] == 1:  # up
-            y, x = p_pos
+        y, x = p_pos
+        if action[0] == 1:  # up
             y = y - 1
-            self.pieces['Player'] = (y, x)
-        elif mv[1] == 1:  # down
-            pass
-        elif mv[2] == 1:  # left
-            pass
-        elif mv[3] == 1:  # right
-            pass
+        elif action[1] == 1:  # down
+            y = y + 1
+        elif action[2] == 1:  # left
+            x = x - 1
+        elif action[3] == 1:  # right
+            x = x + 1
+        new_pos = (y, x)
+        if self._pos_out_of_bounds(new_pos):
+            return
+        self.set_player(new_pos)
 
 
 def create_world():
-    g = GridWorld(size=6, holes=1, walls=1, use_random=True)
+    g = GridWorld(size=6, holes=1, walls=1, use_random=False)
     g.render()
     g.move_player([1, 0, 0, 0])
     g.render()
+
+    # g.move_player([0, 1, 0, 0])
+    # g.render()
+    #
+    # g.move_player([0, 0, 1, 0])
+    # g.render()
+    #
+    # g.move_player([0, 0, 0, 1])
+    # g.render()
 
 
 if __name__ == '__main__':
