@@ -109,7 +109,7 @@ class GridWorld:
         y, x = pos
         return not (0 <= y < self.size) or not (0 <= x < self.size)
 
-    def move_player(self, action: List) -> None:
+    def move_player(self, action: List) -> int:
         # [up, down, left, right]
         # TODO refactor this horrible mess
         p_pos = self.pieces['Player']
@@ -124,8 +124,10 @@ class GridWorld:
             x = x + 1
         new_pos = (y, x)
         if self._pos_out_of_bounds(new_pos):
-            return
+            return -1
         self.set_player(new_pos)
+        # TODO check win/loose
+        return -1
 
 
 def create_world():
