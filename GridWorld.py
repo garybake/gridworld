@@ -20,6 +20,8 @@ class GridWorld:
         'Holes': []
     }
 
+    state = [[]]
+
     def __init__(self, size=4, holes=1, walls=1, use_random=False,
                  rand_seed=42) -> None:
         assert (size >= 4), "Size needs to be >= 4"
@@ -91,7 +93,7 @@ class GridWorld:
 
     def render(self) -> None:
         a = self.to_array()
-        print(a)
+        # print(a)
 
         output = ''
         for row in a:
@@ -102,9 +104,25 @@ class GridWorld:
             output += row_str
         print(output)
 
+    def move_player(self, mv):
+        # [up, down, left, right]
+        p_pos = self.pieces['Player']
+        if mv[0] == 1:  # up
+            y, x = p_pos
+            y = y - 1
+            self.pieces['Player'] = (y, x)
+        elif mv[1] == 1:  # down
+            pass
+        elif mv[2] == 1:  # left
+            pass
+        elif mv[3] == 1:  # right
+            pass
+
 
 def create_world():
     g = GridWorld(size=6, holes=1, walls=1, use_random=True)
+    g.render()
+    g.move_player([1, 0, 0, 0])
     g.render()
 
 
