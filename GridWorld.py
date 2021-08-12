@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, Set, Optional, List
+from typing import Tuple, Set, List, Optional
 
 import numpy as np
 
@@ -20,8 +20,6 @@ class GridWorld:
         'Holes': []
     }
 
-    state = [[]]
-
     def __init__(self, size=4, holes=1, walls=1, use_random=False,
                  rand_seed=42) -> None:
         assert (size >= 4), "Size needs to be >= 4"
@@ -29,12 +27,19 @@ class GridWorld:
         if not use_random:
             random.seed(rand_seed)
         self.size = size
-        self.add_walls(walls)
-        self.add_holes(holes)
+        self.walls = walls
+        self.holes = holes
+        self.reset()
+
+    def reset(self):
+        self.add_walls(self.walls)
+        self.add_holes(self.holes)
         self.add_goal()
         self.set_player()
+        return self.get_state()
 
-    def _filled_positions(self, include_player: bool = False) -> Set[Tuple[int, int]]:
+    def _filled_positions(self, include_player: bool = False) -> Set[
+        Tuple[int, int]]:
         filled = set()
         if include_player and self.pieces['Player']:
             filled.add(self.pieces['Player'])
@@ -92,18 +97,19 @@ class GridWorld:
             a[w] = 3
         return a
 
-    def render(self) -> None:
+    def render(self, raw=False) -> str:
         a = self.to_array()
-        # print(a)
+        if raw:
+            return a
 
         output = ''
         for row in a:
-            row_str = '|'
+            row_str = ''
             for column in row:
-                row_str += ' ' + render_map[column]
-            row_str += ' |\n'
+                row_str += render_map[column]
+            row_str += '\n'
             output += row_str
-        print(output)
+        return output
 
     def _pos_out_of_bounds(self, pos: Tuple[int, int]) -> bool:
         y, x = pos
@@ -111,7 +117,6 @@ class GridWorld:
 
     def move_player(self, action: List) -> int:
         # [up, down, left, right]
-        # TODO refactor this horrible mess
         p_pos = self.pieces['Player']
         y, x = p_pos
         if action[0] == 1:  # up
@@ -126,24 +131,37 @@ class GridWorld:
         if self._pos_out_of_bounds(new_pos):
             return -1
         self.set_player(new_pos)
-        # TODO check win/loose
         return -1
+
+    def get_state(self) -> np.ndarray:
+        # [Player, Goal, Walls, Holes]
+        state = np.zeros((4, self.size, self.size))
+
+        # Player
+        y, x = self.pieces['Player']
+        state[0, y, x] = 1.0
+
+        # Goal
+        y, x = self.pieces['Goal']
+        state[1, y, x] = 1.0
+
+        # Walls
+        for y, x in self.pieces['Walls']:
+            state[2, y, x] = 1.0
+
+        # Holes
+        for y, x in self.pieces['Holes']:
+            state[3, y, x] = 1.0
+
+        return state
 
 
 def create_world():
-    g = GridWorld(size=6, holes=1, walls=1, use_random=False)
-    g.render()
+    g = GridWorld(size=6, holes=1, walls=1, use_random=True)
+    print(g.render())
     g.move_player([1, 0, 0, 0])
-    g.render()
-
-    # g.move_player([0, 1, 0, 0])
-    # g.render()
-    #
-    # g.move_player([0, 0, 1, 0])
-    # g.render()
-    #
-    # g.move_player([0, 0, 0, 1])
-    # g.render()
+    print(g.render())
+    print(g.get_state())
 
 
 if __name__ == '__main__':
