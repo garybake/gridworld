@@ -38,8 +38,7 @@ class GridWorld:
         self.set_player()
         return self.get_state()
 
-    def _filled_positions(self, include_player: bool = False) -> Set[
-        Tuple[int, int]]:
+    def _filled_pos(self, include_player: bool = False) -> Set[Tuple[int, int]]:
         filled = set()
         if include_player and self.pieces['Player']:
             filled.add(self.pieces['Player'])
@@ -50,7 +49,7 @@ class GridWorld:
         return filled
 
     def _is_empty(self, pos: Tuple[int, int]) -> bool:
-        return pos not in self._filled_positions(include_player=True)
+        return pos not in self._filled_pos(include_player=True)
 
     def _get_pos(self) -> Tuple[int, int]:
         return (
@@ -129,7 +128,7 @@ class GridWorld:
             x = x + 1
         new_pos = (y, x)
         if self._pos_out_of_bounds(new_pos):
-            return -1
+            return 0
         self.set_player(new_pos)
         return -1
 
