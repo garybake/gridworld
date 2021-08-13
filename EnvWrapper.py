@@ -26,16 +26,16 @@ class GridWorldEnv(gym.Env):
         return self.g.reset()
 
     def render(self, mode='human') -> None:
-        print(self.g.render)
+        print(self.g.render())
 
     def close(self) -> None:
         pass
 
 
 def create_world():
-    env = GridWorldEnv(size=6, holes=1, walls=1, use_random=True, rand_seed=11)
+    env = GridWorldEnv(size=6, holes=1, walls=1, use_random=False, rand_seed=11)
     obs = env.reset()
-    # env.render()
+    env.render()
 
     cur_step = 0
     max_steps = 100

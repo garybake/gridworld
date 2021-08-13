@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, Set, List, Optional
+from typing import Tuple, Set, List, Optional, Union
 
 import numpy as np
 
@@ -13,6 +13,7 @@ render_map = {
 
 
 class GridWorld:
+
     pieces = {
         'Player': (-1, -1),
         'Goal': (-1, -1),
@@ -29,9 +30,17 @@ class GridWorld:
         self.size = size
         self.walls = walls
         self.holes = holes
-        self.reset()
+
+    def clear_grid(self):
+        self.pieces = {
+            'Player': (-1, -1),
+            'Goal': (-1, -1),
+            'Walls': [],
+            'Holes': []
+        }
 
     def reset(self):
+        self.clear_grid()
         self.add_walls(self.walls)
         self.add_holes(self.holes)
         self.add_goal()
@@ -96,7 +105,7 @@ class GridWorld:
             a[w] = 3
         return a
 
-    def render(self, raw: bool = False) -> str:
+    def render(self, raw: bool = False) -> Union[np.ndarray, str]:
         a = self.to_array()
         if raw:
             return a
@@ -126,7 +135,7 @@ class GridWorld:
         # Other Move
         return -1, False
 
-    def move_player(self, action: List) -> int:
+    def move_player(self, action: List) -> Tuple[int, int]:
         """ [up, down, left, right]
         """
 
@@ -177,8 +186,9 @@ class GridWorld:
 
 def create_world():
     g = GridWorld(size=6, holes=1, walls=1, use_random=False)
+    g.reset()
     print(g.render())
-    rew, done = g.move_player([1, 0, 0, 0])
+    _, _ = g.move_player([1, 0, 0, 0])
 
     rew, done = g.move_player([0, 1, 0, 0])
     print(g.render())
