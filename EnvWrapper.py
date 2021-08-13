@@ -15,11 +15,10 @@ class GridWorldEnv(gym.Env):
                            use_random=use_random, rand_seed=rand_seed)
         self.action_space = spaces.MultiBinary(4)
 
-    def step(self, action: List[int]) -> Tuple[np.ndarray, int, int, dict]:
+    def step(self, action: List[int]) -> Tuple[np.ndarray, int, bool, dict]:
         # action [up, down, left, right]
-        rew = self.g.move_player(action)
+        rew, done = self.g.move_player(action)
         obs = self.g.get_state()
-        done = 0
         info = {}
         return obs, rew, done, info
 
@@ -34,13 +33,18 @@ class GridWorldEnv(gym.Env):
 
 
 def create_world():
-    env = GridWorldEnv(size=6, holes=1, walls=1, use_random=False, rand_seed=11)
+    env = GridWorldEnv(size=6, holes=1, walls=1, use_random=True, rand_seed=11)
     obs = env.reset()
     # env.render()
 
-    for i in range(30):
+    cur_step = 0
+    max_steps = 100
+    done = False
+    while not done and cur_step < max_steps:
+        cur_step += 1
         obs, rew, done, info = env.step(env.action_space.sample())
-        print(rew)
+        # print(rew, done)
+    print(f"Done in {cur_step}")
 
 
 if __name__ == '__main__':

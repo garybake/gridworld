@@ -96,7 +96,7 @@ class GridWorld:
             a[w] = 3
         return a
 
-    def render(self, raw=False) -> str:
+    def render(self, raw: bool = False) -> str:
         a = self.to_array()
         if raw:
             return a
@@ -114,8 +114,22 @@ class GridWorld:
         y, x = pos
         return not (0 <= y < self.size) or not (0 <= x < self.size)
 
+    def get_reward(self) -> Tuple[int, int]:
+        p_pos = self.pieces['Player']
+        # Goal
+        if p_pos == self.pieces['Goal']:
+            return 10, True
+        # Hole
+        for h in self.pieces['Holes']:
+            if p_pos == h:
+                return -10, True
+        # Other Move
+        return -1, False
+
     def move_player(self, action: List) -> int:
-        # [up, down, left, right]
+        """ [up, down, left, right]
+        """
+
         p_pos = self.pieces['Player']
         y, x = p_pos
         if action[0] == 1:  # up
@@ -127,10 +141,16 @@ class GridWorld:
         elif action[3] == 1:  # right
             x = x + 1
         new_pos = (y, x)
-        if self._pos_out_of_bounds(new_pos):
-            return 0
-        self.set_player(new_pos)
-        return -1
+        if not (self._pos_out_of_bounds(new_pos) or self.pos_on_wall(new_pos)):
+            self.set_player(new_pos)
+
+        return self.get_reward()
+
+    def pos_on_wall(self, pos: Tuple[int, int]) -> bool:
+        for h in self.pieces['Holes']:
+            if pos == h:
+                return True
+        return False
 
     def get_state(self) -> np.ndarray:
         # [Player, Goal, Walls, Holes]
@@ -156,11 +176,15 @@ class GridWorld:
 
 
 def create_world():
-    g = GridWorld(size=6, holes=1, walls=1, use_random=True)
+    g = GridWorld(size=6, holes=1, walls=1, use_random=False)
     print(g.render())
-    g.move_player([1, 0, 0, 0])
+    rew, done = g.move_player([1, 0, 0, 0])
+
+    rew, done = g.move_player([0, 1, 0, 0])
     print(g.render())
-    print(g.get_state())
+    print(rew, done)
+    print()
+    # print(g.get_state())
 
 
 if __name__ == '__main__':
