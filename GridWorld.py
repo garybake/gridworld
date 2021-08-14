@@ -135,7 +135,7 @@ class GridWorld:
         # Other Move
         return -1, False
 
-    def move_player(self, action: List) -> Tuple[int, int]:
+    def move_player(self, action: List) -> Tuple[int, bool]:
         """ [up, down, left, right]
         """
 
