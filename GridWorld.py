@@ -1,3 +1,7 @@
+"""
+Gridworld implementation
+"""
+
 import random
 from typing import Tuple, Set, List, Optional, Union
 
@@ -32,6 +36,7 @@ class GridWorld:
         self.holes = holes
 
     def clear_grid(self):
+        """Create an empty grid state"""
         self.pieces = {
             'Player': (-1, -1),
             'Goal': (-1, -1),
@@ -40,6 +45,10 @@ class GridWorld:
         }
 
     def reset(self):
+        """ Reset grid
+        Reset grid to start positions (or random)
+        :return: np.ndarray, game state
+        """
         self.clear_grid()
         self.add_walls(self.walls)
         self.add_holes(self.holes)
@@ -123,7 +132,7 @@ class GridWorld:
         y, x = pos
         return not (0 <= y < self.size) or not (0 <= x < self.size)
 
-    def get_reward(self) -> Tuple[int, int]:
+    def get_reward(self) -> Tuple[int, bool]:
         p_pos = self.pieces['Player']
         # Goal
         if p_pos == self.pieces['Goal']:
