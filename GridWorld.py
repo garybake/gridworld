@@ -59,7 +59,7 @@ class GridWorld:
     def _filled_pos(self, include_player: bool = False) -> Set[Tuple[int, int]]:
         """ Get a list of filled positions
 
-        :param include_player: bool, wether to include the player in the check
+        :param include_player: bool, whether to include the player in the check
         :return: Set[Tuple[int, int]], set of filled positions
         """
         filled = set()
@@ -211,7 +211,7 @@ class GridWorld:
         return -1, False
 
     def move_player(self, action: List) -> Tuple[int, bool]:
-        """ Move the player piece and return [reward, gameover]
+        """ Move the player piece and return [reward, game over]
         Action is sent as an array of
         [up, down, left, right]
         Only the first seen 1 in the array is used
