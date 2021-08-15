@@ -233,7 +233,6 @@ class GridWorld:
         if not (self._pos_out_of_bounds(new_pos) or self.pos_on_wall(new_pos)):
             # Bounce player back
             self.set_player(new_pos)
-        # TODO: player move to hole
         return self.get_reward()
 
     def pos_on_wall(self, pos: Tuple[int, int]) -> bool:
