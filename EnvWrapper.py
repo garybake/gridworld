@@ -46,6 +46,7 @@ class GridWorldEnv(gym.Env):
 
     def step(self, action: List[int]) -> Tuple[np.ndarray, int, bool, dict]:
         """ Take a single action in the game and return the new state
+
         :param action: array [up, down, left, right]
         :return: obs, rew, done, info
         """
@@ -57,6 +58,7 @@ class GridWorldEnv(gym.Env):
     def reset(self) -> np.ndarray:
         """ Reset grid
         Reset grid to start positions (or random)
+
         :return: np.ndarray, game state
         """
         return self.g.reset()
@@ -78,17 +80,20 @@ class GridWorldEnv(gym.Env):
 
 
 def create_world():
-    env = GridWorldEnv(size=6, holes=1, walls=1, use_random=False, rand_seed=11)
+    env = GridWorldEnv(size=6, holes=1, walls=1, use_random=True, rand_seed=11)
     obs = env.reset()
     env.render()
 
     cur_step = 0
     max_steps = 100
     done = False
+    tot_rew = 0
     while not done and cur_step < max_steps:
         cur_step += 1
         obs, rew, done, info = env.step(env.action_space.sample())
+        tot_rew += rew
     print(f"Done in {cur_step}")
+    print(f"Total Reward {tot_rew}")
 
 
 if __name__ == '__main__':
